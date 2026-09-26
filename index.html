@@ -1,0 +1,2064 @@
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f6f8fc" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%232b6ff7'/%3E%3Cpath d='M23.3 19.6v3a1.6 1.6 0 0 1-1.8 1.6A14.2 14.2 0 0 1 7.8 10.5a1.6 1.6 0 0 1 1.6-1.8h3l1.6 3.7-1.9 1.1a9.2 9.2 0 0 0 4.4 4.4l1.1-1.9 3.7 1.6Z' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+    <title>Hívásjegyzetelő — Callnote</title>
+    <style>
+      :root {
+        --ink: #182338;
+        --muted: #718099;
+        --line: #e4e9f1;
+        --surface: #ffffff;
+        --canvas: #f6f8fc;
+        --blue: #2b6ff7;
+        --blue-dark: #1c57d0;
+        --blue-soft: #edf3ff;
+        --mint: #18a783;
+        --mint-soft: #e9f8f4;
+        --amber: #d68621;
+        --amber-soft: #fff5e7;
+        --shadow: 0 18px 50px rgba(43, 58, 87, 0.09);
+        --radius-lg: 24px;
+        --radius-md: 15px;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        min-width: 320px;
+        margin: 0;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 80% -10%, rgba(218, 230, 255, .82), transparent 28rem),
+          var(--canvas);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      button, textarea { font: inherit; }
+      button { cursor: pointer; }
+
+      .shell {
+        width: min(1180px, calc(100% - 48px));
+        margin: 0 auto;
+        padding: 38px 0 54px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 32px;
+        margin-bottom: 34px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        color: var(--ink);
+        font-size: 17px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 38px;
+        height: 38px;
+        place-items: center;
+        border-radius: 12px;
+        color: #fff;
+        background: var(--blue);
+        box-shadow: 0 8px 20px rgba(43, 111, 247, .24);
+      }
+
+      .brand-mark svg { width: 20px; height: 20px; }
+
+      .topbar-note {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .topbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+      }
+
+      .settings-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 38px;
+        padding: 0 12px;
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        color: var(--ink);
+        background: rgba(255, 255, 255, .72);
+        font-size: 13px;
+        font-weight: 750;
+        transition: border-color .18s ease, background .18s ease, transform .18s ease;
+      }
+
+      .settings-btn:hover {
+        border-color: #adc5fa;
+        background: #fff;
+        transform: translateY(-1px);
+      }
+
+      .settings-btn svg { width: 16px; height: 16px; color: var(--blue); }
+
+      .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--mint);
+        box-shadow: 0 0 0 4px var(--mint-soft);
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(280px, 390px);
+        gap: 28px;
+        align-items: stretch;
+        margin-bottom: 26px;
+      }
+
+      h1, h2, p { margin: 0; }
+
+      h1 {
+        max-width: 650px;
+        margin-top: 8px;
+        font-size: clamp(2.25rem, 5vw, 4.45rem);
+        font-weight: 800;
+        line-height: .98;
+        letter-spacing: -0.065em;
+      }
+
+      .hero-copy {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 18px 0 24px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 17px;
+        color: var(--blue);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+      }
+
+      .eyebrow svg { width: 15px; height: 15px; }
+
+      .hero-description {
+        max-width: 530px;
+        margin-top: 22px;
+        color: var(--muted);
+        font-size: 17px;
+        line-height: 1.6;
+      }
+
+      .load-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 225px;
+        padding: 26px;
+        border: 1px solid rgba(43, 111, 247, .12);
+        border-radius: var(--radius-lg);
+        background: linear-gradient(145deg, #ffffff 0%, #f2f6ff 100%);
+        box-shadow: var(--shadow);
+      }
+
+      .load-card-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .load-icon {
+        display: grid;
+        width: 48px;
+        height: 48px;
+        place-items: center;
+        border-radius: 15px;
+        color: var(--blue);
+        background: var(--blue-soft);
+      }
+
+      .load-icon svg { width: 23px; height: 23px; }
+
+      .mini-label {
+        margin-top: 3px;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .11em;
+        text-transform: uppercase;
+      }
+
+      .load-title {
+        margin-top: 9px;
+        font-size: 19px;
+        font-weight: 750;
+        letter-spacing: -0.025em;
+      }
+
+      .transcript-label {
+        display: block;
+        margin-top: 21px;
+        margin-bottom: 8px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .transcript-input {
+        display: block;
+        width: 100%;
+        min-height: 76px;
+        resize: vertical;
+        padding: 11px 13px;
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        outline: none;
+        color: var(--ink);
+        background: rgba(255, 255, 255, .82);
+        font-size: 13px;
+        line-height: 1.48;
+        transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+      }
+
+      .transcript-input:focus {
+        border-color: #8cb0fa;
+        background: #fff;
+        box-shadow: 0 0 0 4px var(--blue-soft);
+      }
+
+      .caller-fields {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+
+      .caller-field label {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 750;
+      }
+
+      .caller-field input {
+        width: 100%;
+        min-height: 42px;
+        padding: 0 11px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        outline: none;
+        color: var(--ink);
+        background: rgba(255, 255, 255, .82);
+        font-size: 13px;
+      }
+
+      .caller-field input:focus {
+        border-color: #8cb0fa;
+        background: #fff;
+        box-shadow: 0 0 0 4px var(--blue-soft);
+      }
+
+      .voice-capture {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        margin-bottom: 13px;
+        padding: 11px 13px 11px 11px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, .68);
+      }
+
+      .mic-button {
+        position: relative;
+        display: grid;
+        width: 64px;
+        height: 64px;
+        flex: 0 0 64px;
+        place-items: center;
+        border: 0;
+        border-radius: 50%;
+        color: #fff;
+        background: var(--blue);
+        box-shadow: 0 9px 19px rgba(43, 111, 247, .26);
+        touch-action: manipulation;
+        transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+      }
+
+      .mic-button:hover {
+        background: var(--blue-dark);
+        box-shadow: 0 12px 24px rgba(43, 111, 247, .3);
+        transform: translateY(-1px);
+      }
+
+      .mic-button svg { width: 24px; height: 24px; }
+      .mic-button.is-listening {
+        background: #e04f58;
+        box-shadow: 0 0 0 8px rgba(224, 79, 88, .11), 0 10px 22px rgba(224, 79, 88, .3);
+        animation: mic-pulse 1.35s ease-in-out infinite;
+      }
+
+      .mic-button.is-listening:hover { background: #c93c48; }
+      @keyframes mic-pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.06); }
+      }
+
+      .voice-copy { min-width: 0; }
+      .voice-title {
+        color: var(--ink);
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .voice-status {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      .voice-status.is-listening {
+        color: #c93c48;
+        font-weight: 750;
+      }
+
+      .interim-status {
+        min-height: 16px;
+        margin-top: 3px;
+        color: #a2acba;
+        font-size: 11px;
+        font-style: italic;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+      }
+
+      .simulate-btn, .primary-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        min-height: 48px;
+        border: 0;
+        border-radius: 12px;
+        color: #fff;
+        background: var(--blue);
+        font-weight: 750;
+        transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+      }
+
+      .simulate-btn {
+        width: 100%;
+        margin-top: 17px;
+        padding: 0 18px;
+        box-shadow: 0 9px 20px rgba(43, 111, 247, .2);
+      }
+
+      .simulate-btn:hover, .primary-btn:hover {
+        background: var(--blue-dark);
+        box-shadow: 0 12px 24px rgba(43, 111, 247, .23);
+        transform: translateY(-1px);
+      }
+
+      .simulate-btn:disabled { cursor: wait; opacity: .76; transform: none; }
+      .simulate-btn svg, .primary-btn svg { width: 18px; height: 18px; }
+
+      .workspace {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(310px, .9fr);
+        gap: 26px;
+        align-items: start;
+      }
+
+      .card {
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        background: var(--surface);
+        box-shadow: 0 10px 34px rgba(43, 58, 87, .045);
+      }
+
+      .call-card { overflow: hidden; }
+
+      .card-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 25px 27px 21px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .section-kicker {
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+      }
+
+      h2 {
+        margin-top: 6px;
+        font-size: 20px;
+        letter-spacing: -0.035em;
+      }
+
+      .category-pill, .urgent-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 27px;
+        padding: 0 10px;
+        border-radius: 99px;
+        font-size: 12px;
+        font-weight: 750;
+        white-space: nowrap;
+      }
+
+      .category-pill {
+        color: var(--blue);
+        background: var(--blue-soft);
+      }
+
+      .category-pill svg, .urgent-pill svg { width: 14px; height: 14px; }
+      .urgent-pill { color: #b56412; background: var(--amber-soft); }
+
+      .details-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0 24px;
+        padding: 7px 27px 22px;
+      }
+
+      .detail {
+        min-height: 71px;
+        padding: 17px 0 14px;
+        border-bottom: 1px solid #eef1f5;
+      }
+
+      .detail:nth-last-child(-n + 2) { border-bottom: 0; }
+
+      .detail-label {
+        margin-bottom: 6px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .detail-value {
+        color: var(--ink);
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .summary {
+        margin: 0 27px 27px;
+        padding: 20px;
+        border-radius: 16px;
+        background: #f8faff;
+      }
+
+      .summary-heading {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 11px;
+        color: var(--blue);
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .summary-heading svg { width: 17px; height: 17px; }
+
+      .summary p {
+        color: #43516a;
+        font-size: 14px;
+        line-height: 1.65;
+      }
+
+      .side-stack { display: grid; gap: 20px; }
+
+      .calendar-card {
+        padding: 23px 25px 25px;
+        border-color: #b9d0ff;
+        background: linear-gradient(145deg, #f8fbff 0%, #edf4ff 100%);
+        box-shadow: 0 14px 34px rgba(43, 111, 247, .12);
+      }
+
+      .calendar-card h2 { margin-top: 7px; }
+      .calendar-card-copy {
+        margin-top: 9px;
+        color: #53627b;
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
+      .calendar-date {
+        margin-top: 11px;
+        color: var(--blue-dark);
+        font-size: 12px;
+        font-weight: 750;
+      }
+
+      .calendar-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 43px;
+        margin-top: 17px;
+        padding: 0 15px;
+        border-radius: 11px;
+        color: #fff;
+        background: var(--blue);
+        box-shadow: 0 8px 17px rgba(43, 111, 247, .2);
+        font-size: 13px;
+        font-weight: 800;
+        text-decoration: none;
+      }
+
+      .calendar-link:hover { background: var(--blue-dark); }
+      .calendar-link svg { width: 16px; height: 16px; }
+
+      .webhook-status {
+        min-height: 17px;
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.4;
+      }
+
+      .note-card { padding: 24px 25px 25px; }
+      .note-card h2 { margin-bottom: 6px; }
+
+      .note-helper {
+        margin-bottom: 17px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      textarea {
+        display: block;
+        width: 100%;
+        min-height: 138px;
+        resize: vertical;
+        padding: 15px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        outline: none;
+        color: var(--ink);
+        background: #fbfcfe;
+        font-size: 14px;
+        line-height: 1.55;
+        transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+      }
+
+      textarea::placeholder { color: #a6afbf; }
+      textarea:focus {
+        border-color: #8cb0fa;
+        background: #fff;
+        box-shadow: 0 0 0 4px var(--blue-soft);
+      }
+
+      .urgent-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin-top: 18px;
+      }
+
+      .checkbox-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--ink);
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .checkbox-label input {
+        width: 18px;
+        height: 18px;
+        margin: 0;
+        accent-color: var(--amber);
+      }
+
+      .urgent-copy {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .actions-card { padding: 24px 25px 25px; }
+      .actions-card h2 { margin-bottom: 19px; }
+
+      .action-list { display: grid; gap: 10px; }
+
+      .action-btn {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        min-height: 52px;
+        padding: 0 15px;
+        border: 1px solid var(--line);
+        border-radius: 13px;
+        color: var(--ink);
+        background: #fff;
+        text-align: left;
+        font-size: 14px;
+        font-weight: 700;
+        transition: border-color .18s ease, background .18s ease, transform .18s ease;
+      }
+
+      .action-btn:not(:disabled):hover {
+        border-color: #adc5fa;
+        background: #f8faff;
+        transform: translateX(2px);
+      }
+
+      .action-btn:disabled {
+        cursor: not-allowed;
+        color: #b0b8c6;
+        background: #fafbfc;
+      }
+
+      .action-icon {
+        display: grid;
+        width: 30px;
+        height: 30px;
+        flex: 0 0 30px;
+        place-items: center;
+        border-radius: 9px;
+        color: var(--blue);
+        background: var(--blue-soft);
+      }
+
+      .action-btn:disabled .action-icon {
+        color: #aeb7c5;
+        background: #f0f2f5;
+      }
+
+      .action-icon svg { width: 16px; height: 16px; }
+      .action-label { flex: 1; }
+      .action-arrow { width: 16px; height: 16px; color: #a0abbb; }
+
+      .empty-state {
+        display: flex;
+        min-height: 333px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 38px;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      .empty-icon {
+        display: grid;
+        width: 54px;
+        height: 54px;
+        margin-bottom: 16px;
+        place-items: center;
+        border-radius: 17px;
+        color: #8da9dd;
+        background: #eef3fb;
+      }
+
+      .empty-icon svg { width: 25px; height: 25px; }
+      .empty-state strong { color: var(--ink); font-size: 15px; }
+      .empty-state span { max-width: 270px; margin-top: 7px; font-size: 13px; line-height: 1.55; }
+
+      .is-hidden { display: none !important; }
+
+      .toast {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        max-width: min(390px, calc(100% - 48px));
+        padding: 14px 17px;
+        border: 1px solid rgba(24, 167, 131, .2);
+        border-radius: 13px;
+        color: #126b58;
+        background: #f0fbf8;
+        box-shadow: 0 14px 35px rgba(38, 88, 87, .14);
+        font-size: 13px;
+        font-weight: 750;
+        animation: toast-in .25s ease-out;
+      }
+
+      .toast svg { width: 18px; height: 18px; flex: 0 0 18px; }
+      @keyframes toast-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+      .api-error {
+        display: flex;
+        align-items: flex-start;
+        gap: 13px;
+        margin-bottom: 26px;
+        padding: 16px 17px;
+        border: 1px solid #f2b8bd;
+        border-radius: 15px;
+        color: #8d1f2c;
+        background: #fff1f2;
+        box-shadow: 0 8px 24px rgba(177, 47, 59, .08);
+      }
+
+      .api-error > svg {
+        width: 21px;
+        height: 21px;
+        flex: 0 0 21px;
+        margin-top: 1px;
+      }
+
+      .api-error-copy { min-width: 0; flex: 1; }
+      .api-error-copy strong { display: block; font-size: 13px; }
+      .api-error-copy p {
+        margin-top: 5px;
+        color: #a12b37;
+        font-size: 13px;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+      }
+
+      .api-error-close {
+        display: grid;
+        width: 27px;
+        height: 27px;
+        flex: 0 0 27px;
+        place-items: center;
+        border: 0;
+        border-radius: 8px;
+        color: #a12b37;
+        background: transparent;
+      }
+
+      .api-error-close:hover { background: #ffe0e3; }
+      .api-error-close svg { width: 16px; height: 16px; }
+
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 20;
+        display: grid;
+        place-items: center;
+        padding: 22px;
+        background: rgba(24, 35, 56, .42);
+        backdrop-filter: blur(6px);
+      }
+
+      .settings-dialog {
+        position: relative;
+        width: min(100%, 480px);
+        padding: 28px;
+        border: 1px solid rgba(255, 255, 255, .72);
+        border-radius: 22px;
+        background: #fff;
+        box-shadow: 0 28px 80px rgba(24, 35, 56, .24);
+      }
+
+      .modal-close {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        display: grid;
+        width: 34px;
+        height: 34px;
+        place-items: center;
+        border: 0;
+        border-radius: 10px;
+        color: var(--muted);
+        background: #f5f7fa;
+      }
+
+      .modal-close:hover { color: var(--ink); background: var(--blue-soft); }
+      .modal-close svg { width: 17px; height: 17px; }
+      .settings-dialog h2 { padding-right: 35px; }
+      .dialog-copy {
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .key-label {
+        display: block;
+        margin-top: 22px;
+        margin-bottom: 8px;
+        color: var(--ink);
+        font-size: 13px;
+        font-weight: 750;
+      }
+
+      .key-input {
+        width: 100%;
+        min-height: 46px;
+        padding: 0 13px;
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        outline: none;
+        color: var(--ink);
+        background: #fbfcfe;
+        font-size: 13px;
+      }
+
+      .key-input:focus {
+        border-color: #8cb0fa;
+        background: #fff;
+        box-shadow: 0 0 0 4px var(--blue-soft);
+      }
+
+      .saved-key-preview {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        min-height: 35px;
+        margin-top: 10px;
+        padding: 7px 10px;
+        border-radius: 9px;
+        color: var(--muted);
+        background: #f6f8fb;
+        font-size: 12px;
+      }
+
+      .saved-key-preview code {
+        color: var(--ink);
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .settings-status {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        margin-top: 12px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .settings-status svg { width: 15px; height: 15px; flex: 0 0 15px; color: var(--mint); }
+      .optional-label { color: #9aa5b6; font-size: 10px; font-weight: 600; }
+      .webhook-help { margin-top: 7px; font-size: 12px; }
+      .webhook-row {
+        display: flex;
+        align-items: stretch;
+        gap: 8px;
+      }
+
+      .webhook-row .key-input {
+        min-width: 0;
+        flex: 1;
+      }
+
+      .webhook-test-btn {
+        flex: 0 0 auto;
+        min-height: 46px;
+        padding: 0 12px;
+        border: 1px solid #b9d0ff;
+        border-radius: 11px;
+        color: var(--blue-dark);
+        background: var(--blue-soft);
+        font-size: 12px;
+        font-weight: 750;
+      }
+
+      .webhook-test-btn:hover { background: #e1ebff; }
+      .webhook-test-btn:disabled { cursor: wait; opacity: .65; }
+      .webhook-test-status {
+        min-height: 18px;
+        margin-top: 7px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      .automation-status {
+        min-height: 18px;
+        margin: 10px 2px 0;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1.4;
+      }
+
+      .automation-status.is-success { color: #13745f; }
+      .automation-status.is-warning { color: #a86614; }
+      .automation-status.is-info { color: #53627b; }
+      .settings-actions { display: flex; gap: 10px; margin-top: 23px; }
+      .secondary-btn, .danger-btn {
+        min-height: 44px;
+        padding: 0 15px;
+        border-radius: 11px;
+        font-size: 13px;
+        font-weight: 750;
+      }
+
+      .secondary-btn {
+        flex: 1;
+        border: 0;
+        color: #fff;
+        background: var(--blue);
+      }
+
+      .secondary-btn:hover { background: var(--blue-dark); }
+      .danger-btn {
+        border: 1px solid #f0d8bd;
+        color: #b56412;
+        background: var(--amber-soft);
+      }
+
+      .danger-btn:hover { background: #ffedd3; }
+
+      .loading-dots::after {
+        content: "";
+        display: inline-block;
+        width: 1em;
+        text-align: left;
+        animation: dots 1.2s steps(4, end) infinite;
+      }
+      @keyframes dots { 0%, 20% { content: ""; } 40% { content: "."; } 60% { content: ".."; } 80%, 100% { content: "..."; } }
+
+      @media (max-width: 840px) {
+        .hero, .workspace { grid-template-columns: 1fr; }
+        .hero-copy { padding-bottom: 0; }
+        .load-card { min-height: 0; }
+      }
+
+      @media (max-width: 560px) {
+        .shell { width: min(100% - 28px, 1180px); padding-top: 22px; }
+        .topbar { margin-bottom: 22px; }
+        .topbar-actions { gap: 0; }
+        .topbar-note { display: none; }
+        h1 { font-size: 2.7rem; }
+        .hero-description { font-size: 15px; }
+        .load-card, .card-header, .note-card, .actions-card { padding-left: 20px; padding-right: 20px; }
+        .calendar-card { padding-right: 20px; padding-left: 20px; }
+        .details-grid { padding-left: 20px; padding-right: 20px; gap: 0 15px; }
+        .summary { margin-right: 20px; margin-left: 20px; }
+        .card-header { align-items: flex-start; flex-direction: column; gap: 12px; }
+        .empty-state { min-height: 280px; padding: 28px; }
+        .caller-fields { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2.2 2A18 18 0 0 1 3 5.2 2 2 0 0 1 5 3h4l2 5-2.5 1.5a12 12 0 0 0 6 6L16 13l5 2Z"></path>
+            </svg>
+          </span>
+          Callnote
+        </div>
+        <div class="topbar-actions">
+          <div class="topbar-note"><span class="status-dot"></span> Hívásjegyzeteid egy helyen</div>
+          <button class="settings-btn" id="settingsButton" type="button" aria-label="OpenAI API beállítások" aria-haspopup="dialog">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.8 1.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.1h-2.6V20a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1-1.8-1.8.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H6v-2.6h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1 1.8-1.8.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6V5h2.6v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1 1.8 1.8-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.1v2.6h-.1a1.7 1.7 0 0 0-1.3 1.3Z"></path></svg>
+            Beállítások
+          </button>
+        </div>
+      </header>
+
+      <section class="hero" aria-labelledby="page-title">
+        <div class="hero-copy">
+          <div class="eyebrow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"></path><path d="m19 16 .7 2.3L22 19l-2.3.7L19 22l-.7-2.3L16 19l2.3-.7L19 16Z"></path>
+            </svg>
+            AI hívásjegyzetelő
+          </div>
+          <h1 id="page-title">A beszélgetésből<br /><span style="color: var(--blue)">teendőlista.</span></h1>
+          <p class="hero-description">Töltsd be a legutóbbi hívás összefoglalóját, egészítsd ki a saját gondolataiddal, majd intézd el a következő lépést.</p>
+        </div>
+
+        <div class="load-card">
+          <div class="load-card-top">
+            <div>
+              <div class="mini-label">Új jegyzet</div>
+              <div class="load-title">Készen állsz az elemzésre?</div>
+            </div>
+            <div class="load-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+              </svg>
+            </div>
+          </div>
+          <label class="transcript-label" for="transcript">Nyers hívásszöveg</label>
+          <div class="caller-fields" aria-label="Hívó adatai">
+            <div class="caller-field">
+              <label for="callerInput">Hívó / partner neve</label>
+              <input id="callerInput" type="text" autocomplete="name" placeholder="Pl. Kovács Anna" />
+            </div>
+            <div class="caller-field">
+              <label for="companyInput">Cég neve</label>
+              <input id="companyInput" type="text" autocomplete="organization" placeholder="Pl. Nordline Solutions Kft." />
+            </div>
+          </div>
+          <div class="voice-capture">
+            <button class="mic-button" id="micButton" type="button" aria-label="Hangjegyzet indítása" aria-pressed="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="3" width="8" height="12" rx="4"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3M8 21h8"></path></svg>
+            </button>
+            <div class="voice-copy">
+              <div class="voice-title" id="voiceTitle">Hangjegyzet hozzáadása</div>
+              <div class="voice-status" id="voiceStatus">Nyomd meg a mikrofont, majd beszélj magyarul.</div>
+              <div class="interim-status" id="interimStatus" aria-live="polite"></div>
+            </div>
+          </div>
+          <textarea class="transcript-input" id="transcript" aria-label="Nyers hívásszöveg">Kovács Anna a Nordline Solutions Kft.-től keresett a Q4 kampányterv miatt. Megbeszéltük az új kreatív irányt és azt, hogy a végleges anyagot péntekig elküldjük. A tesztkampány jövő kedden indulhat, ha a költségkeretet jóváhagyják. A hívás körülbelül 24 percig tartott.</textarea>
+          <button class="simulate-btn" id="processCall" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"></path><path d="m19 16 .7 2.3L22 19l-2.3.7L19 22l-.7-2.3L16 19l2.3-.7L19 16Z"></path></svg>
+            <span>Elemzés GPT-4o-mini-val</span>
+          </button>
+          <p class="automation-status" id="automationStatus" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <div class="api-error is-hidden" id="apiError" role="alert" aria-live="assertive">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v4M12 16h.01"></path></svg>
+        <div class="api-error-copy">
+          <strong>OpenAI API hiba</strong>
+          <p id="apiErrorText"></p>
+        </div>
+        <button class="api-error-close" id="dismissApiError" type="button" aria-label="API hiba bezárása">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+        </button>
+      </div>
+
+      <section class="workspace" aria-label="Hívásjegyzet munkaterület">
+        <article class="card call-card">
+          <div class="card-header">
+            <div>
+              <div class="section-kicker">Feldolgozott hívás</div>
+              <h2 id="callHeading">Hívás részletei</h2>
+            </div>
+            <div class="category-pill is-hidden" id="categoryPill">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7h-9M20 12h-9M20 17h-9M4 7h.01M4 12h.01M4 17h.01"></path></svg>
+              <span id="categoryValue">Céges</span>
+            </div>
+          </div>
+
+          <div class="empty-state" id="emptyState">
+            <div class="empty-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 3.1 5.2 2 2 0 0 1 5.1 3h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.8a2 2 0 0 1-.5 2.1L9 10.8a16 16 0 0 0 4.2 4.2l1.2-1.2a2 2 0 0 1 2.1-.5c.8.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"></path></svg>
+            </div>
+            <strong>Még nincs feldolgozott hívás</strong>
+            <span>Kattints a fenti gombra, és itt jelennek meg a beszélgetés részletei.</span>
+          </div>
+
+          <div id="callContent" class="is-hidden">
+            <div class="details-grid">
+              <div class="detail"><div class="detail-label">Időpont</div><div class="detail-value" id="callTime">—</div></div>
+              <div class="detail"><div class="detail-label">Hívó neve</div><div class="detail-value" id="callerName">—</div></div>
+              <div class="detail"><div class="detail-label">Cégnév</div><div class="detail-value" id="companyName">—</div></div>
+              <div class="detail"><div class="detail-label">Kategória</div><div class="detail-value" id="callCategory">—</div></div>
+              <div class="detail"><div class="detail-label">Időtartam</div><div class="detail-value" id="callDuration">—</div></div>
+              <div class="detail"><div class="detail-label">Tárgy</div><div class="detail-value" id="callSubject">—</div></div>
+              <div class="detail"><div class="detail-label">Állapot</div><div class="detail-value" id="callStatus">Feldolgozva</div></div>
+            </div>
+            <div class="summary">
+              <div class="summary-heading">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"></path><path d="M12 8v4l2.5 2.5M17 3h4v4"></path><path d="m21 3-4 4"></path></svg>
+                AI összefoglaló
+              </div>
+              <p id="summaryText"></p>
+            </div>
+          </div>
+        </article>
+
+        <div class="side-stack">
+          <article class="card note-card">
+            <div class="section-kicker">Saját megjegyzés</div>
+            <h2>Kiegészítés</h2>
+            <p class="note-helper">Van hozzáfűznivalód?</p>
+            <textarea id="additionalNote" placeholder="Írd le a következő lépést, egy fontos részletet vagy bármit, amit nem szeretnél elfelejteni…" aria-label="Kiegészítő megjegyzés"></textarea>
+            <div class="urgent-row">
+              <label class="checkbox-label" for="urgent">
+                <input type="checkbox" id="urgent" />
+                <span>Sürgős</span>
+              </label>
+              <span class="urgent-copy">Jelöld, ha gyors választ igényel</span>
+            </div>
+          </article>
+
+          <article class="card calendar-card is-hidden" id="calendarCard" aria-live="polite">
+            <div class="section-kicker">Felismerve a beszélgetésben</div>
+            <h2 id="calendarTitle">Naptári emlékeztető</h2>
+            <p class="calendar-card-copy" id="calendarDetails"></p>
+            <div class="calendar-date" id="calendarDate"></div>
+            <a class="calendar-link" id="googleCalendarLink" href="#" target="_blank" rel="noopener noreferrer">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"></path></svg>
+              Naptárba mentés
+            </a>
+            <div class="webhook-status" id="webhookStatus"></div>
+          </article>
+
+          <article class="card actions-card">
+            <div class="section-kicker">Következő lépés</div>
+            <h2>Műveletek</h2>
+            <div class="action-list">
+              <button class="action-btn" id="emailBtn" type="button" disabled>
+                <span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg></span>
+                <span class="action-label">E-mail küldése</span>
+                <svg class="action-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+              </button>
+              <button class="action-btn" id="calendarBtn" type="button" disabled>
+                <span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"></path></svg></span>
+                <span class="action-label">Google Naptár megnyitása</span>
+                <svg class="action-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+              </button>
+              <button class="action-btn" id="saveBtn" type="button" disabled>
+                <span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"></path><path d="M17 21v-8H7v8M7 3v5h8"></path></svg></span>
+                <span class="action-label">Jegyzet mentése</span>
+                <svg class="action-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+              </button>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <div class="toast is-hidden" id="toast" role="status" aria-live="polite">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"></path></svg>
+      <span id="toastText">Elkészült.</span>
+    </div>
+
+    <div class="modal-backdrop is-hidden" id="settingsModal" role="presentation">
+      <section class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+        <button class="modal-close" id="closeSettings" type="button" aria-label="Beállítások bezárása">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+        </button>
+        <div class="section-kicker">Kapcsolat</div>
+        <h2 id="settingsTitle">OpenAI API beállítások</h2>
+        <p class="dialog-copy">A GPT-4o-mini elemzéshez add meg az OpenAI API-kulcsodat. A kulcs csak ezen a böngészőn, helyben a localStorage-ban kerül mentésre.</p>
+        <form id="settingsForm">
+          <label class="key-label" for="apiKey">API-kulcs</label>
+          <input class="key-input" id="apiKey" type="password" autocomplete="off" spellcheck="false" placeholder="sk-…" />
+          <div class="saved-key-preview" id="savedKeyPreview" aria-live="polite">
+            <span>Mentett kulcs:</span>
+            <code id="savedKeyMask">Nincs elmentve</code>
+          </div>
+          <div class="settings-status">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v5c0 5 3.4 8.8 8 10 4.6-1.2 8-5 8-10V6l-8-3Z"></path><path d="m9 12 2 2 4-4"></path></svg>
+            <span>Biztonsági figyelmeztetés: kliensoldali tárolás esetén a kulcsot ne használd nyilvánosan megosztott vagy éles alkalmazásban.</span>
+          </div>
+          <label class="key-label" for="webhookUrl">Naptár webhook URL <span class="optional-label">(opcionális)</span></label>
+          <div class="webhook-row">
+            <input class="key-input" id="webhookUrl" type="url" autocomplete="url" spellcheck="false" placeholder="https://hooks.example.com/…" />
+            <button class="webhook-test-btn" id="testWebhook" type="button">Webhook tesztelése</button>
+          </div>
+          <p class="webhook-test-status" id="webhookTestStatus" aria-live="polite"></p>
+          <p class="dialog-copy webhook-help">Ha megadsz Make vagy Zapier webhookot, az azonosított emlékeztető adatai automatikusan POST kérésben elküldődnek.</p>
+          <div class="settings-actions">
+            <button class="danger-btn" id="clearApiKey" type="button">Kulcs törlése</button>
+            <button class="secondary-btn" id="saveApiKey" type="button">Beállítások mentése</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <script>
+      (() => {
+        const API_KEY_STORAGE = "callnote-openai-api-key";
+        const WEBHOOK_STORAGE = "callnote-calendar-webhook";
+        const $ = (id) => document.getElementById(id);
+        const processButton = $("processCall");
+        const emptyState = $("emptyState");
+        const callContent = $("callContent");
+        const categoryPill = $("categoryPill");
+        const emailButton = $("emailBtn");
+        const calendarButton = $("calendarBtn");
+        const saveButton = $("saveBtn");
+        const noteField = $("additionalNote");
+        const urgentField = $("urgent");
+        const callerInput = $("callerInput");
+        const companyInput = $("companyInput");
+        const transcriptField = $("transcript");
+        const micButton = $("micButton");
+        const voiceTitle = $("voiceTitle");
+        const voiceStatus = $("voiceStatus");
+        const interimStatus = $("interimStatus");
+        const settingsModal = $("settingsModal");
+        const apiKeyField = $("apiKey");
+        const apiError = $("apiError");
+        const apiErrorText = $("apiErrorText");
+        const savedKeyMask = $("savedKeyMask");
+        const webhookUrlField = $("webhookUrl");
+        const testWebhookButton = $("testWebhook");
+        const webhookTestStatus = $("webhookTestStatus");
+        const automationStatus = $("automationStatus");
+        const calendarCard = $("calendarCard");
+        const calendarTitle = $("calendarTitle");
+        const calendarDetails = $("calendarDetails");
+        const calendarDate = $("calendarDate");
+        const googleCalendarLink = $("googleCalendarLink");
+        const webhookStatus = $("webhookStatus");
+        const mediaRecorderSupported = Boolean(
+          window.MediaRecorder && navigator.mediaDevices && navigator.mediaDevices.getUserMedia
+        );
+        let call = null;
+        let loaded = false;
+        let isListening = false;
+        let finalTranscript = "";
+        let speechError = false;
+        let mediaRecorder = null;
+        let mediaStream = null;
+        let audioChunks = [];
+        let audioMimeType = "";
+        let audioContext = null;
+        let analyser = null;
+        let analyserSource = null;
+        let vadFrame = null;
+        let silenceStartedAt = null;
+        let speechDetected = false;
+        let calendarWebhookSentFor = "";
+        let toastTimer;
+
+        function formatDate(date) {
+          return new Intl.DateTimeFormat("hu-HU", {
+            year: "numeric", month: "long", day: "numeric",
+            hour: "2-digit", minute: "2-digit"
+          }).format(date);
+        }
+
+        function showToast(message) {
+          $("toastText").textContent = message;
+          $("toast").classList.remove("is-hidden");
+          clearTimeout(toastTimer);
+          toastTimer = setTimeout(() => $("toast").classList.add("is-hidden"), 3600);
+        }
+
+        function showApiError(message, status) {
+          const exactMessage = status ? `${message} (HTTP ${status})` : message;
+          apiErrorText.textContent = exactMessage;
+          apiError.classList.remove("is-hidden");
+        }
+
+        function clearApiError() {
+          apiError.classList.add("is-hidden");
+          apiErrorText.textContent = "";
+        }
+
+        function setActionsEnabled(enabled) {
+          emailButton.disabled = !enabled;
+          saveButton.disabled = !enabled;
+          calendarButton.disabled = !enabled || !call?.calendar?.has_reminder;
+        }
+
+        function getApiKey() {
+          const storedKey = localStorage.getItem(API_KEY_STORAGE) || "";
+          const trimmedKey = storedKey.trim();
+          if (storedKey !== trimmedKey) {
+            if (trimmedKey) {
+              localStorage.setItem(API_KEY_STORAGE, trimmedKey);
+            } else {
+              localStorage.removeItem(API_KEY_STORAGE);
+            }
+          }
+          return trimmedKey;
+        }
+
+        function maskApiKey(apiKey) {
+          const trimmedKey = (apiKey || "").trim();
+          if (!trimmedKey) return "Nincs elmentve";
+          if (trimmedKey.length <= 8) {
+            return `${trimmedKey.slice(0, 2)}...${trimmedKey.slice(-2)}`;
+          }
+          return `${trimmedKey.slice(0, Math.min(8, trimmedKey.length - 4))}...${trimmedKey.slice(-4)}`;
+        }
+
+        function updateSavedKeyPreview() {
+          savedKeyMask.textContent = maskApiKey(getApiKey());
+        }
+
+        function setAutomationStatus(message, kind = "info") {
+          automationStatus.textContent = message;
+          automationStatus.className = `automation-status is-${kind}`;
+        }
+
+        function validateWebhookUrl(value) {
+          const trimmed = (value || "").trim();
+          if (!trimmed) return "";
+          try {
+            const parsedUrl = new URL(trimmed);
+            if (!["http:", "https:"].includes(parsedUrl.protocol)) throw new Error();
+            return parsedUrl.toString();
+          } catch (error) {
+            throw new Error("A webhook URL-nek érvényes http vagy https címnek kell lennie.");
+          }
+        }
+
+        function saveWebhookUrl(value) {
+          const webhookUrl = validateWebhookUrl(value);
+          if (webhookUrl) {
+            localStorage.setItem(WEBHOOK_STORAGE, webhookUrl);
+          } else {
+            localStorage.removeItem(WEBHOOK_STORAGE);
+          }
+          return webhookUrl;
+        }
+
+        function getWebhookUrl() {
+          const storedUrl = (localStorage.getItem(WEBHOOK_STORAGE) || "").trim();
+          if (!storedUrl) {
+            localStorage.removeItem(WEBHOOK_STORAGE);
+            return "";
+          }
+          try {
+            return saveWebhookUrl(storedUrl);
+          } catch (error) {
+            localStorage.removeItem(WEBHOOK_STORAGE);
+            console.warn("[Callnote] Érvénytelen mentett webhook URL törölve.");
+            return "";
+          }
+        }
+
+        function openSettings() {
+          apiKeyField.value = getApiKey();
+          webhookUrlField.value = getWebhookUrl();
+          updateSavedKeyPreview();
+          settingsModal.classList.remove("is-hidden");
+          setTimeout(() => apiKeyField.focus(), 0);
+        }
+
+        function closeSettings() {
+          settingsModal.classList.add("is-hidden");
+        }
+
+        function renderCall(result) {
+          $("callTime").textContent = result.timestamp;
+          $("callerName").textContent = result.callerName;
+          $("companyName").textContent = result.companyName;
+          $("callCategory").textContent = result.category;
+          $("callDuration").textContent = result.duration;
+          $("callSubject").textContent = result.subject;
+          $("summaryText").textContent = result.summary;
+          $("categoryValue").textContent = result.category;
+          $("callHeading").textContent = result.subject;
+          $("callStatus").textContent = "GPT-4o-mini válasza";
+          if (!callerInput.value.trim() && result.callerName !== "Nem derül ki a beszélgetésből") {
+            callerInput.value = result.callerName;
+          }
+          if (!companyInput.value.trim() && result.companyName !== "Nem derül ki a beszélgetésből") {
+            companyInput.value = result.companyName;
+          }
+          emptyState.classList.add("is-hidden");
+          callContent.classList.remove("is-hidden");
+          categoryPill.classList.remove("is-hidden");
+          renderCalendarCard(result.calendar);
+        }
+
+        function normalizeCall(result) {
+          const fallback = "Nem derül ki a beszélgetésből";
+          const category = ["Céges", "Magán"].includes(result.category) ? result.category : "Céges";
+          const rawCalendar = result.calendar || {};
+          return {
+            timestamp: result.timestamp?.trim() || fallback,
+            callerName: callerInput.value.trim() || result.callerName?.trim() || fallback,
+            companyName: companyInput.value.trim() || result.companyName?.trim() || fallback,
+            category,
+            duration: result.duration?.trim() || fallback,
+            subject: result.subject?.trim() || "Hívás összefoglaló",
+            summary: result.summary?.trim() || fallback,
+            calendar: {
+              has_reminder: rawCalendar.has_reminder === true,
+              title: rawCalendar.title?.trim() || "Emlékeztető",
+              datetime_iso: rawCalendar.datetime_iso?.trim() || "",
+              details: rawCalendar.details?.trim() || ""
+            }
+          };
+        }
+
+        function currentBudapestDateIso() {
+          const parts = new Intl.DateTimeFormat("en-CA", {
+            timeZone: "Europe/Budapest",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
+          }).formatToParts(new Date());
+          const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+          return `${values.year}-${values.month}-${values.day}`;
+        }
+
+        function googleCalendarDate(value) {
+          return value.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
+        }
+
+        function buildGoogleCalendarUrl(reminder) {
+          const start = new Date(reminder.datetime_iso);
+          if (Number.isNaN(start.getTime())) return "";
+          const end = new Date(start.getTime() + 30 * 60 * 1000);
+          const params = new URLSearchParams({
+            action: "TEMPLATE",
+            text: reminder.title,
+            dates: `${googleCalendarDate(start)}/${googleCalendarDate(end)}`,
+            details: reminder.details || fullNote()
+          });
+          return `https://calendar.google.com/calendar/render?${params.toString()}`;
+        }
+
+        function renderCalendarCard(reminder) {
+          calendarWebhookSentFor = "";
+          if (!reminder?.has_reminder || !reminder.datetime_iso) {
+            calendarCard.classList.add("is-hidden");
+            googleCalendarLink.href = "#";
+            webhookStatus.textContent = "";
+            setAutomationStatus("ℹ️ Csak jegyzet mentve (naptárkérés nem történt).", "info");
+            return;
+          }
+
+          const calendarUrl = buildGoogleCalendarUrl(reminder);
+          const reminderDate = new Date(reminder.datetime_iso);
+          if (!calendarUrl || Number.isNaN(reminderDate.getTime())) {
+            calendarCard.classList.add("is-hidden");
+            return;
+          }
+
+          calendarTitle.textContent = reminder.title;
+          calendarDetails.textContent = reminder.details || "A beszélgetés alapján naptári emlékeztetőt azonosítottunk.";
+          calendarDate.textContent = formatDate(reminderDate);
+          googleCalendarLink.href = calendarUrl;
+          calendarCard.classList.remove("is-hidden");
+          webhookStatus.textContent = "";
+          sendCalendarWebhook(reminder);
+        }
+
+        function buildWebhookPayload(reminder, isTest = false) {
+          return {
+            source: "callnote",
+            test: isTest,
+            reminder: {
+              has_reminder: Boolean(reminder?.has_reminder),
+              title: reminder.title,
+              datetime_iso: reminder.datetime_iso,
+              details: reminder.details
+            },
+            caller: {
+              name: call?.callerName || "",
+              company: call?.companyName || ""
+            }
+          };
+        }
+
+        async function sendWebhookRequest(webhookUrl, payload) {
+          const serializedPayload = JSON.stringify(payload);
+          console.log("[Callnote] Webhook cél-URL:", webhookUrl);
+          console.log("[Callnote] Webhook JSON:", serializedPayload);
+
+          try {
+                // 1. Biztosítjuk, hogy a Make minden mezőnevet (title, summary, start, datetime_iso) megkapjon:
+                  const eventTitle = payload?.reminder?.title || payload?.title || payload?.summary || "Új naptáresemény";
+                  const eventDate = payload?.reminder?.datetime_iso || payload?.datetime_iso || payload?.start || "";
+                  const eventDetails = payload?.reminder?.details || payload?.details || payload?.description || "";
+
+                  const cleanPayload = {
+                    title: eventTitle,
+                    summary: eventTitle,
+                    start: eventDate,
+                    datetime_iso: eventDate,
+                    details: eventDetails,
+                    description: eventDetails
+                  };
+
+                  const serializedData = JSON.stringify(cleanPayload);
+
+                  const response = await fetch("/api/webhook", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ webhook_url: webhookUrl, payload: cleanPayload })
+                  });
+                  const responsePayload = await response.json().catch(() => ({}));
+                  if (!response.ok) {
+                    throw new Error(responsePayload?.error?.message || `Backend webhook hiba (HTTP ${response.status})`);
+                  }
+                  return responsePayload;
+                } catch (backendError) {
+                  console.warn("[Callnote] Backend webhook proxy hiba, közvetlen fallback indul:", backendError.message);
+                  try {
+                    await fetch(webhookUrl, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      mode: "no-cors",
+                      body: serializedData
+                    });
+              return { ok: true, fallback: true };
+            } catch (directError) {
+              throw new Error(`A webhook küldése nem sikerült: ${directError.message || backendError.message}`);
+            }
+          }
+        }
+
+        async function sendCalendarWebhook(reminder) {
+          const webhookUrl = getWebhookUrl();
+          if (!webhookUrl) {
+            webhookStatus.textContent = "⚠️ Webhook URL nincs megadva a beállításokban.";
+            setAutomationStatus("⚠️ Webhook URL nincs megadva a beállításokban.", "warning");
+            return;
+          }
+
+          const deliveryKey = `${webhookUrl}|${reminder.title}|${reminder.datetime_iso}`;
+          if (calendarWebhookSentFor === deliveryKey) return;
+          const payload = buildWebhookPayload(reminder);
+          webhookStatus.textContent = "Webhook küldése…";
+          setAutomationStatus("Webhook küldése a Make.com-nak…", "info");
+          try {
+            const result = await sendWebhookRequest(webhookUrl, payload);
+            calendarWebhookSentFor = deliveryKey;
+            const sentMessage = "📡 Naptár webhook kiküldve a Make.com-nak...";
+            webhookStatus.textContent = sentMessage;
+            setAutomationStatus(sentMessage, "success");
+            console.log("[Callnote] Webhook küldés sikeres:", result);
+          } catch (error) {
+            webhookStatus.textContent = "A webhook küldése nem sikerült; a Google Naptár-link továbbra is használható.";
+            setAutomationStatus(`⚠️ ${error.message}`, "warning");
+            console.error("[Callnote] Naptár webhook hiba:", error);
+          }
+        }
+
+        function removeAdjacentWordDuplicates(text) {
+          let cleaned = text.trim();
+          let previous;
+          do {
+            previous = cleaned;
+            cleaned = cleaned.replace(/\b(\w+)\s+\1\b/gi, "$1");
+          } while (cleaned !== previous);
+          return cleaned.replace(/\s+/g, " ").trim();
+        }
+
+        function setMicState(listening) {
+          isListening = listening;
+          micButton.classList.toggle("is-listening", listening);
+          micButton.setAttribute("aria-pressed", String(listening));
+          micButton.setAttribute("aria-label", listening ? "Hangjegyzet leállítása" : "Hangjegyzet indítása");
+          voiceTitle.textContent = listening ? "Hallgatlak…" : "Hangjegyzet hozzáadása";
+          voiceStatus.textContent = listening
+            ? "Beszélj nyugodtan, a mikrofon rögzíti a hangodat…"
+            : "Nyomd meg a mikrofont, majd beszélj magyarul.";
+          voiceStatus.classList.toggle("is-listening", listening);
+          if (!listening) interimStatus.textContent = "";
+        }
+
+        function chooseAudioMimeType() {
+          const candidates = [
+            "audio/webm;codecs=opus",
+            "audio/webm",
+            "audio/mp4",
+            "audio/ogg;codecs=opus"
+          ];
+          return candidates.find((type) => MediaRecorder.isTypeSupported(type)) || "";
+        }
+
+        function audioFilename(mimeType) {
+          if (mimeType.includes("mp4")) return "hangjegyzet.m4a";
+          if (mimeType.includes("ogg")) return "hangjegyzet.ogg";
+          if (mimeType.includes("wav")) return "hangjegyzet.wav";
+          return "hangjegyzet.webm";
+        }
+
+        async function transcribeAudio(blob, mimeType) {
+          const formData = new FormData();
+          formData.append("file", blob, audioFilename(mimeType));
+          const apiKey = getApiKey();
+          const headers = apiKey ? { "X-OpenAI-API-Key": apiKey } : {};
+
+          voiceTitle.textContent = "Leirat készítése…";
+          voiceStatus.textContent = "A hangfájlt elküldöm a biztonságos belső végpontra…";
+          try {
+            const response = await fetch("/api/transcribe", {
+              method: "POST",
+              headers,
+              body: formData
+            });
+            const payload = await response.json().catch(() => ({}));
+            if (!response.ok) {
+              const apiMessage = payload?.error?.message || `Leiratozási hiba (${response.status})`;
+              const transcriptionError = new Error(apiMessage);
+              transcriptionError.status = response.status;
+              throw transcriptionError;
+            }
+
+            const recognizedText = removeAdjacentWordDuplicates(payload?.text || "");
+            if (!recognizedText) throw new Error("A Whisper nem adott vissza leiratot.");
+            transcriptField.value = recognizedText;
+            voiceTitle.textContent = "Hangjegyzet hozzáadása";
+            voiceStatus.textContent = "A leirat elkészült, az elemzés automatikusan indul.";
+            showToast("A hangjegyzet elkészült, az elemzés automatikusan indul.");
+            analyzeCall();
+          } catch (error) {
+            console.error("Whisper leiratozási hiba:", error.message);
+            const isApiKeyError = error.status === 401 || /api key|authentication|invalid key/i.test(error.message || "");
+            if (isApiKeyError) {
+              showApiError(error.message, error.status);
+            } else {
+              showToast(error.message || "A hang leiratozása nem sikerült. Próbáld újra.");
+            }
+            setMicState(false);
+          }
+        }
+
+        function cleanupVoiceActivityDetection() {
+          if (vadFrame !== null) {
+            cancelAnimationFrame(vadFrame);
+            vadFrame = null;
+          }
+          analyserSource?.disconnect();
+          analyser?.disconnect();
+          analyserSource = null;
+          analyser = null;
+          if (audioContext && audioContext.state !== "closed") {
+            audioContext.close().catch(() => {});
+          }
+          audioContext = null;
+          silenceStartedAt = null;
+          speechDetected = false;
+        }
+
+        function startVoiceActivityDetection() {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (!AudioContextClass || !mediaStream) {
+            voiceStatus.textContent = "Rögzítek… a leállításhoz nyomd meg újra a mikrofont.";
+            return;
+          }
+
+          try {
+            audioContext = new AudioContextClass();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 512;
+            analyser.smoothingTimeConstant = 0.78;
+            analyserSource = audioContext.createMediaStreamSource(mediaStream);
+            analyserSource.connect(analyser);
+            const waveform = new Uint8Array(analyser.fftSize);
+            const silenceThreshold = 0.06;
+            const silenceDuration = 1800;
+
+            const monitorVolume = () => {
+              if (!analyser || !isListening) return;
+              analyser.getByteTimeDomainData(waveform);
+              let squareSum = 0;
+              for (const sample of waveform) {
+                const normalized = (sample - 128) / 128;
+                squareSum += normalized * normalized;
+              }
+              const rms = Math.sqrt(squareSum / waveform.length);
+              const now = performance.now();
+
+              if (rms >= silenceThreshold) {
+                speechDetected = true;
+                silenceStartedAt = null;
+                voiceStatus.textContent = "Beszéd érzékelve…";
+              } else if (speechDetected) {
+                silenceStartedAt ??= now;
+                const silenceElapsed = now - silenceStartedAt;
+                if (silenceElapsed >= silenceDuration) {
+                  voiceStatus.textContent = "Csend… a felvétel leállítása.";
+                  stopAudioRecording();
+                  return;
+                }
+                voiceStatus.textContent = `Csend… leállítás ${((silenceDuration - silenceElapsed) / 1000).toFixed(1)} mp múlva`;
+              } else {
+                voiceStatus.textContent = "Beszélj, figyelek…";
+              }
+              vadFrame = requestAnimationFrame(monitorVolume);
+            };
+
+            if (audioContext.state === "suspended") audioContext.resume().catch(() => {});
+            monitorVolume();
+          } catch (error) {
+            console.warn("VAD inicializálási hiba:", error.message);
+            cleanupVoiceActivityDetection();
+            voiceStatus.textContent = "Rögzítek… a leállításhoz nyomd meg újra a mikrofont.";
+          }
+        }
+
+        async function startAudioRecording() {
+          if (!mediaRecorderSupported) {
+            showToast("A böngésző nem támogatja a hangrögzítést.");
+            return;
+          }
+
+          finalTranscript = "";
+          speechError = false;
+          transcriptField.value = "";
+          interimStatus.textContent = "";
+          voiceStatus.textContent = "Mikrofon engedélyezése…";
+
+          try {
+            mediaStream = await navigator.mediaDevices.getUserMedia({
+              audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true }
+            });
+            audioMimeType = chooseAudioMimeType();
+            try {
+              mediaRecorder = audioMimeType
+                ? new MediaRecorder(mediaStream, { mimeType: audioMimeType })
+                : new MediaRecorder(mediaStream);
+            } catch (error) {
+              audioMimeType = "";
+              mediaRecorder = new MediaRecorder(mediaStream);
+            }
+            audioChunks = [];
+            mediaRecorder.ondataavailable = (event) => {
+              if (event.data && event.data.size > 0) audioChunks.push(event.data);
+            };
+            mediaRecorder.onerror = () => {
+              speechError = true;
+              cleanupVoiceActivityDetection();
+              setMicState(false);
+              mediaStream?.getTracks().forEach((track) => track.stop());
+              showToast("A hangrögzítés hibába ütközött. Próbáld újra.");
+            };
+            mediaRecorder.onstop = async () => {
+              const recordedMimeType = mediaRecorder.mimeType || audioMimeType || "audio/webm";
+              const recordedBlob = new Blob(audioChunks, { type: recordedMimeType });
+              cleanupVoiceActivityDetection();
+              mediaStream?.getTracks().forEach((track) => track.stop());
+              mediaStream = null;
+              setMicState(false);
+              if (!speechError && recordedBlob.size > 0) {
+                await transcribeAudio(recordedBlob, recordedMimeType);
+              } else if (!speechError) {
+                showToast("Nem készült használható hangfelvétel. Próbáld újra.");
+              }
+            };
+            mediaRecorder.start();
+            setMicState(true);
+            startVoiceActivityDetection();
+          } catch (error) {
+            mediaStream?.getTracks().forEach((track) => track.stop());
+            mediaStream = null;
+            setMicState(false);
+            showToast(error.name === "NotAllowedError"
+              ? "A mikrofon használata nincs engedélyezve."
+              : "A mikrofon indítása nem sikerült. Próbáld újra.");
+          }
+        }
+
+        function stopAudioRecording() {
+          if (mediaRecorder && mediaRecorder.state !== "inactive") {
+            cleanupVoiceActivityDetection();
+            mediaRecorder.stop();
+          }
+        }
+
+        function setupAudioRecorder() {
+          if (!mediaRecorderSupported) {
+            micButton.disabled = true;
+            micButton.setAttribute("aria-label", "A böngésző nem támogatja a hangrögzítést");
+            voiceTitle.textContent = "Hangrögzítés nem érhető el";
+            voiceStatus.textContent = "Próbáld friss Chrome vagy Samsung Internet böngészőben.";
+          }
+        }
+
+        function toggleAudioRecording() {
+          if (isListening) {
+            stopAudioRecording();
+          } else {
+            startAudioRecording();
+          }
+        }
+
+        async function analyzeCall() {
+          const apiKey = getApiKey();
+          if (!apiKey) {
+            openSettings();
+            showToast("Az elemzéshez előbb mentsd el az OpenAI API-kulcsot.");
+            return;
+          }
+
+          const transcript = transcriptField.value.trim();
+          if (!transcript) {
+            showToast("Írd be a nyers hívásszöveget az elemzéshez.");
+            transcriptField.focus();
+            return;
+          }
+
+          clearApiError();
+          processButton.disabled = true;
+          setActionsEnabled(false);
+          processButton.querySelector("span").innerHTML = 'GPT-4o-mini elemzése<span class="loading-dots"></span>';
+
+          const schema = {
+            type: "object",
+            additionalProperties: false,
+            properties: {
+              timestamp: { type: "string", description: "A hívás időpontja a szöveg alapján, vagy jelezd, ha nem derül ki." },
+              callerName: { type: "string", description: "A hívó teljes neve, vagy jelezd, ha nem derül ki." },
+              companyName: { type: "string", description: "A cég neve, vagy jelezd, ha nem derül ki." },
+              category: { type: "string", enum: ["Céges", "Magán"] },
+              duration: { type: "string", description: "A hívás időtartama, vagy jelezd, ha nem derül ki." },
+              subject: { type: "string", description: "Rövid, informatív tárgy magyarul." },
+              summary: { type: "string", description: "Tömör, 2-4 mondatos magyar összefoglaló a fontos döntésekről és következő lépésekről." },
+              calendar: {
+                type: "object",
+                additionalProperties: false,
+                properties: {
+                  has_reminder: { type: "boolean", description: "Igaz, ha a beszélgetés emlékeztetőt, határidőt vagy naptárbejegyzést kér." },
+                  title: { type: "string", description: "Az emlékeztető rövid címe, vagy üres szöveg, ha nincs emlékeztető." },
+                  datetime_iso: { type: "string", description: "Az esemény helyi időpontja YYYY-MM-DDTHH:MM:SS formátumban, vagy üres szöveg." },
+                  details: { type: "string", description: "Az esemény részletei, vagy üres szöveg." }
+                },
+                required: ["has_reminder", "title", "datetime_iso", "details"]
+              }
+            },
+            required: ["timestamp", "callerName", "companyName", "category", "duration", "subject", "summary", "calendar"]
+          };
+          const todayIso = currentBudapestDateIso();
+          const manualCallerContext = [
+            callerInput.value.trim() ? `Manuálisan megadott hívó/partner neve: ${callerInput.value.trim()}` : "",
+            companyInput.value.trim() ? `Manuálisan megadott cég neve: ${companyInput.value.trim()}` : ""
+          ].filter(Boolean).join("\n");
+
+          try {
+            const response = await fetch("https://api.openai.com/v1/chat/completions", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + apiKey.trim()
+              },
+              body: JSON.stringify({
+                model: "gpt-4o-mini",
+                temperature: 0.2,
+                response_format: {
+                  type: "json_schema",
+                  json_schema: { name: "call_note", strict: true, schema }
+                },
+                messages: [
+                  {
+                    role: "system",
+                    content: `Te egy magyar nyelvű hívásjegyzetelő asszisztens vagy. A kapott nyers hívásszöveget elemezd kizárólag a szövegben szereplő információk alapján. Ne találj ki adatokat. Ha valami nem derül ki, írd azt, hogy Nem derül ki a beszélgetésből. A category mező értéke kizárólag Céges vagy Magán lehet. A mai dátum ${todayIso}. Vizsgáld meg, kér-e a beszélő emlékeztetőt, határidőt vagy naptárbejegyzést, például "péntek 10-re állíts be emlékeztetőt" vagy "holnap hívjam vissza". Ha igen, a calendar.has_reminder legyen true, számítsd ki a relatív időpontot a mai dátumhoz képest, és add meg a helyi időt YYYY-MM-DDTHH:MM:SS formátumban. Ha nincs ilyen kérés, a calendar mezőben has_reminder legyen false, a többi mező pedig üres szöveg.`
+                  },
+                  {
+                    role: "user",
+                    content: `Elemezd ezt a nyers hívásszöveget, és add vissza a kért struktúrában.${manualCallerContext ? `\n\n${manualCallerContext}` : ""}\n\nNyers hívásszöveg:\n${transcript}`
+                  }
+                ]
+              })
+            });
+
+            const payload = await response.json().catch(() => ({}));
+            if (!response.ok) {
+              const apiMessage = payload?.error?.message || `OpenAI API hiba (${response.status})`;
+              const apiErrorResponse = new Error(apiMessage);
+              apiErrorResponse.status = response.status;
+              throw apiErrorResponse;
+            }
+
+            const content = payload?.choices?.[0]?.message?.content;
+            if (!content) throw new Error("Az OpenAI nem adott értelmezhető választ.");
+            call = normalizeCall(JSON.parse(content));
+            renderCall(call);
+            loaded = true;
+            setActionsEnabled(true);
+            clearApiError();
+            showToast("A GPT-4o-mini elkészítette a hívás összefoglalóját.");
+          } catch (error) {
+            console.error("OpenAI elemzési hiba:", error.message);
+            const isApiKeyError = error.status === 401 || /api key|authentication|invalid key/i.test(error.message || "");
+            if (isApiKeyError) {
+              showApiError(error.message, error.status);
+            } else {
+              showToast(`Az elemzés nem sikerült: ${error.message}`);
+            }
+            setActionsEnabled(loaded);
+          } finally {
+            processButton.querySelector("span").textContent = "Elemzés GPT-4o-mini-val";
+            processButton.disabled = false;
+          }
+        }
+
+        function fullNote() {
+          if (!call) return "";
+          const urgency = urgentField.checked ? "\n\nJELÖLÉS: Sürgős" : "";
+          const additional = noteField.value.trim() ? `\n\nKiegészítés:\n${noteField.value.trim()}` : "";
+          const reminder = call.calendar?.has_reminder
+            ? `\n\nNaptári emlékeztető:\n${call.calendar.title}\n${call.calendar.datetime_iso}\n${call.calendar.details}`
+            : "";
+          return [
+            `Hívásjegyzet — ${call.subject}`,
+            "",
+            `Időpont: ${call.timestamp}`,
+            `Hívó neve: ${call.callerName}`,
+            `Cégnév: ${call.companyName}`,
+            `Kategória: ${call.category}`,
+            `Időtartam: ${call.duration}`,
+            "",
+            "AI összefoglaló:",
+            call.summary,
+            reminder,
+            additional,
+            urgency
+          ].join("\n");
+        }
+
+        function openGoogleCalendar() {
+          const calendarUrl = googleCalendarLink.getAttribute("href");
+          if (!calendarUrl || calendarUrl === "#") {
+            showToast("Ehhez a híváshoz nem találtam naptári emlékeztetőt.");
+            return;
+          }
+          window.open(calendarUrl, "_blank", "noopener,noreferrer");
+        }
+
+        $("settingsButton").addEventListener("click", openSettings);
+        $("closeSettings").addEventListener("click", closeSettings);
+        $("dismissApiError").addEventListener("click", clearApiError);
+        $("settingsForm").addEventListener("submit", (event) => {
+          event.preventDefault();
+          $("saveApiKey").click();
+        });
+        settingsModal.addEventListener("click", (event) => {
+          if (event.target === settingsModal) closeSettings();
+        });
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "Escape" && !settingsModal.classList.contains("is-hidden")) closeSettings();
+        });
+
+        $("saveApiKey").addEventListener("click", () => {
+          const apiKey = apiKeyField.value.trim();
+          let webhookUrl = "";
+          try {
+            webhookUrl = validateWebhookUrl(webhookUrlField.value);
+          } catch (error) {
+            showToast(error.message);
+            webhookUrlField.focus();
+            return;
+          }
+          if (!apiKey && !webhookUrl) {
+            showToast("Adj meg legalább egy API-kulcsot vagy webhook URL-t.");
+            apiKeyField.focus();
+            return;
+          }
+          if (apiKey) {
+            localStorage.setItem(API_KEY_STORAGE, apiKey);
+          } else {
+            localStorage.removeItem(API_KEY_STORAGE);
+          }
+          saveWebhookUrl(webhookUrl);
+          apiKeyField.value = apiKey;
+          webhookUrlField.value = webhookUrl;
+          updateSavedKeyPreview();
+          closeSettings();
+          showToast("A beállítások mentve ezen az eszközön.");
+        });
+
+        testWebhookButton.addEventListener("click", async () => {
+          let webhookUrl = "";
+          try {
+            webhookUrl = validateWebhookUrl(webhookUrlField.value || getWebhookUrl());
+          } catch (error) {
+            webhookTestStatus.textContent = `⚠️ ${error.message}`;
+            webhookUrlField.focus();
+            return;
+          }
+          if (!webhookUrl) {
+            webhookTestStatus.textContent = "⚠️ Webhook URL nincs megadva a beállításokban.";
+            webhookUrlField.focus();
+            return;
+          }
+
+          saveWebhookUrl(webhookUrl);
+          webhookUrlField.value = webhookUrl;
+          const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+          const testReminder = {
+            has_reminder: true,
+            title: "Callnote webhook teszt",
+            datetime_iso: tomorrow.toISOString().slice(0, 19),
+            details: "Ez egy tesztküldés a Callnote Beállítások menüjéből."
+          };
+          const payload = buildWebhookPayload(testReminder, true);
+          testWebhookButton.disabled = true;
+          webhookTestStatus.textContent = "Teszt küldése…";
+          try {
+            await sendWebhookRequest(webhookUrl, payload);
+            webhookTestStatus.textContent = "Teszt sikeresen elküldve!";
+            console.log("[Callnote] Webhook teszt sikeres.");
+          } catch (error) {
+            webhookTestStatus.textContent = `⚠️ ${error.message}`;
+            console.error("[Callnote] Webhook teszt hiba:", error);
+          } finally {
+            testWebhookButton.disabled = false;
+          }
+        });
+
+        $("clearApiKey").addEventListener("click", () => {
+          localStorage.removeItem(API_KEY_STORAGE);
+          apiKeyField.value = "";
+          updateSavedKeyPreview();
+          showToast("Az API-kulcs törölve.");
+        });
+
+        setupAudioRecorder();
+        micButton.addEventListener("click", toggleAudioRecording);
+        processButton.addEventListener("click", analyzeCall);
+
+        emailButton.addEventListener("click", () => {
+          const subject = encodeURIComponent(`Hívásjegyzet — ${call.subject}`);
+          const body = encodeURIComponent(fullNote());
+          window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        });
+
+        calendarButton.addEventListener("click", openGoogleCalendar);
+
+        saveButton.addEventListener("click", () => {
+          const saved = {
+            note: fullNote(),
+            urgent: urgentField.checked,
+            callerName: callerInput.value.trim(),
+            companyName: companyInput.value.trim(),
+            savedAt: new Date().toISOString()
+          };
+          localStorage.setItem("callnote-latest", JSON.stringify(saved));
+          showToast("A jegyzet mentve a böngészőben.");
+        });
+
+        updateSavedKeyPreview();
+        if (getApiKey()) {
+          $("settingsButton").setAttribute("aria-label", "OpenAI API beállítások — kulcs mentve");
+        }
+
+        const stored = localStorage.getItem("callnote-latest");
+        if (stored) {
+          try {
+            const saved = JSON.parse(stored);
+            const noteMatch = saved.note?.match(/Kiegészítés:\n([\s\S]*?)(?:\n\nJELÖLÉS: Sürgős)?$/);
+            if (noteMatch) noteField.value = noteMatch[1].trim();
+            if (saved.urgent) urgentField.checked = true;
+            if (saved.callerName) callerInput.value = saved.callerName;
+            if (saved.companyName) companyInput.value = saved.companyName;
+          } catch (error) {
+            localStorage.removeItem("callnote-latest");
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>

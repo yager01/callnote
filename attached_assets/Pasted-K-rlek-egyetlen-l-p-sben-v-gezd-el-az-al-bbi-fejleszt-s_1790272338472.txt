@@ -1,0 +1,29 @@
+Kérlek, egyetlen lépésben végezd el az alábbi fejlesztéseket a projekten:
+
+1. AUTOMATIKUS CSENDÉRZÉKELÉS (Voice Activity Detection - VAD):
+   - Amikor a MediaRecorder rögzít, kapcsolj be egy Web Audio API AnalyserNode-ot a hangerőszint figyelésére.
+   - Amíg beszél a felhasználó, a rögzítés tart.
+   - Ha a felhasználó abbahagyja a beszédet és legalább 2.5 másodpercig csend van (a mért hangerő a küszöbérték alatt marad), automatikusan állítsa le a felvételt, küldje el a hangot az /api/transcribe végpontra, és indítsa el az elemzést.
+   - Képernyőn látszódjon a visszajelzés (pl. "Beszéd érzékelve..." / "Csend... leállítás").
+
+2. HANGUTASÍTÁSOS NAPTÁR ÉS EMLÉKEZTETŐ FELISMERÉS:
+   - Egészítsd ki a GPT-4o-mini promptját: elemezze a szöveget, hogy tartalmaz-e emlékeztetőre, határidőre vagy naptárbejegyzésre vonatkozó kérést (pl. "péntek 10-re állíts be emlékeztetőt", "holnap hívjam vissza").
+   - Ha igen, a JSON válaszban térjen vissza egy naptár objektummal:
+     {
+       "has_reminder": true,
+       "title": "Esemény címe",
+       "datetime_iso": "YYYY-MM-DDTHH:MM:SS",
+       "details": "Részletes leírás"
+     }
+   - Számolja ki a relatív időpontokat (pl. "holnap", "hétfőn") a mai naphoz viszonyítva.
+
+3. KÖZVETLEN GOOGLE NAPTÁR BEJEGYZÉS (.ICS LETÖLTÉS HELYETT):
+   - Töröld a manuális .ics fájl letöltést!
+   - Ha a GPT naptári emlékeztetőt azonosított (has_reminder === true), azonnal jelenítsen meg egy kiemelt "Naptárba mentés" kártyát, és:
+     a) Generáljon egy közvetlen Google Naptár esemény-linket (https://calendar.google.com/calendar/render?action=TEMPLATE&text=...&dates=...&details=...), amely egyetlen kattintással a telefonon közvetlenül a Google Naptárban menti el az eseményt.
+     b) Ha a beállításokban meg van adva egy Webhook URL (pl. Make / Zapier), automatikusan küldje el oda a naptáradatokat POST JSON formátumban a háttérben történő azonnali rögzítéshez.
+
+4. HÍVÓADATOK (MANUÁLIS / ELŐKÉSZÍTETT MEZŐK):
+   - Mivel a böngésző nem fér hozzá a híváslistához, tegyél a képernyő tetejére egy gyors "Hívó / Partner neve és cége" mezőt, amit opcionálisan ki lehet tölteni vagy a GPT automatikusan kitölt a diktálás alapján.
+
+Frissítsd a backendet és frontendet, majd hajts végre egy sikeres Publish / Deploy-t!
