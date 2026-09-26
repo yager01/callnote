@@ -1509,7 +1509,7 @@
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
                       mode: "no-cors",
-                      body: serializedData
+                      body: JSON.stringify(payload)
                     });
               return { ok: true, fallback: true };
             } catch (directError) {
