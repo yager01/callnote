@@ -1453,32 +1453,34 @@
   }
 
   // Mindig elküldjük a Make webhookot (Sheets mentéshez), akár van naptár, akár nincs:
+  const currentCall = (typeof call !== "undefined") ? call : {};
+
   sendCalendarWebhook(reminder || {
     has_reminder: false,
-    title: call?.topic || call?.summary || "Hívásjegyzet",
-    details: call?.summary || call?.rawText || "",
+    title: currentCall?.topic || currentCall?.summary || "Hívásjegyzet",
+    details: currentCall?.summary || currentCall?.rawText || "",
     datetime_iso: ""
-  });  
-        
-        function buildWebhookPayload(reminder, isTest = false) {
-          return {
-            source: "callnote",
-            test: isTest,
-            reminder: {
-      has_reminder: Boolean(reminder?.has_reminder),
-      title: reminder?.title || call?.topic || call?.summary || "Hívásjegyzet",
-      datetime_iso: reminder?.datetime_iso || "",
-      details: reminder?.details || call?.summary || ""
-    },
-    caller: {
-      name: call?.callerName || "",
-      company: call?.companyName || ""
-    },
-    summary: call?.summary || reminder?.details || "",
-    raw_text: call?.rawText || ""
-  };
-        }
+  });
 
+  function buildWebhookPayload(reminder, isTest = false) {
+    const c = (typeof call !== "undefined") ? call : {};
+    return {
+      source: "callnote",
+      test: isTest,
+      reminder: {
+        has_reminder: Boolean(reminder?.has_reminder),
+        title: reminder?.title || c?.topic || c?.summary || "Hívásjegyzet",
+        datetime_iso: reminder?.datetime_iso || "",
+        details: reminder?.details || c?.summary || ""
+      },
+      caller: {
+        name: c?.callerName || "",
+        company: c?.companyName || ""
+      },
+      summary: c?.summary || reminder?.details || "",
+      raw_text: c?.rawText || ""
+    };
+  }
         async function sendWebhookRequest(webhookUrl, payload) {
           const serializedPayload = JSON.stringify(payload);
           console.log("[Callnote] Webhook cél-URL:", webhookUrl);
