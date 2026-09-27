@@ -1531,34 +1531,38 @@
           }
         }
 
-        async function sendCalendarWebhook(reminder) {
-          const webhookUrl = getWebhookUrl();
-          if (!webhookUrl) {
-            webhookStatus.textContent = "⚠️ Webhook URL nincs megadva a beállításokban.";
-            setAutomationStatus("⚠️ Webhook URL nincs megadva a beállításokban.", "warning");
-            return;
-          }
+        let lastSentDeliveryKey = "";
 
-         const noteTitle = (reminder && reminder.title) ? reminder.title : (window.currentNoteTitle || "Jegyzet");
+async function sendCalendarWebhook(reminder) {
+  const webhookUrl = getWebhookUrl();
+  if (!webhookUrl) {
+    webhookStatus.textContent = "⚠️ Webhook URL nincs megadva a beállításokban.";
+    setAutomationStatus("⚠️ Webhook URL nincs megadva a beállításokban.", "warning");
+    return;
+  }
+
+  const noteTitle = (reminder && reminder.title) ? reminder.title : (window.currentNoteTitle || "Jegyzet");
   const noteDate = (reminder && reminder.datetime_iso) ? reminder.datetime_iso : new Date().toISOString();
   const deliveryKey = `${webhookUrl}|${noteTitle}|${noteDate}`;
-  if (calendarWebhooksSentFor === deliveryKey) return;
+
+  if (lastSentDeliveryKey === deliveryKey) return;
+
   const payload = buildWebhookPayload(reminder || { title: noteTitle, summary: "", details: "" });
-          webhookStatus.textContent = "Webhook küldése…";
-          setAutomationStatus("Webhook küldése a Make.com-nak…", "info");
-          try {
-            const result = await sendWebhookRequest(webhookUrl, payload);
-            calendarWebhookSentFor = deliveryKey;
-            const sentMessage = "📡 Naptár webhook kiküldve a Make.com-nak...";
-            webhookStatus.textContent = sentMessage;
-            setAutomationStatus(sentMessage, "success");
-            console.log("[Callnote] Webhook küldés sikeres:", result);
-          } catch (error) {
-            webhookStatus.textContent = "A webhook küldése nem sikerült; a Google Naptár-link továbbra is használható.";
-            setAutomationStatus(`⚠️ ${error.message}`, "warning");
-            console.error("[Callnote] Naptár webhook hiba:", error);
-          }
-        }
+  webhookStatus.textContent = "Webhook küldése...";
+  setAutomationStatus("Webhook küldése a Make.com-nak...", "info");
+
+  try {
+    const result = await sendWebhookRequest(webhookUrl, payload);
+    lastSentDeliveryKey = deliveryKey;
+    const sentMessage = "📡 Naptár webhook kiküldve a Make.com-nak...";
+    webhookStatus.textContent = sentMessage;
+    setAutomationStatus(sentMessage, "success");
+  } catch (err) {
+    console.error("[Callnote] Webhook küldési hiba:", err);
+    webhookStatus.textContent = "❌ Webhook hiba.";
+    setAutomationStatus("❌ Webhook hiba a Make.com felé.", "error");
+  }
+}
 
         function removeAdjacentWordDuplicates(text) {
           let cleaned = text.trim();
