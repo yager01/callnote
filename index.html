@@ -1434,33 +1434,34 @@
             googleCalendarLink.href = "#";
             webhookStatus.textContent = "";
             setAutomationStatus("ℹ️ Csak jegyzet mentve (naptárkérés nem történt).", "info");
-            return;
-          }
+    
+    // Webhook küldése a Google Sheets-be naptár nélküli jegyzetnél:
+    const safeCall = (typeof call !== "undefined" && call) ? call : {};
+    sendCalendarWebhook({
+      has_reminder: false,
+      title: safeCall?.topic || safeCall?.summary || "Hívásjegyzet",
+      details: safeCall?.summary || safeCall?.rawText || "",
+      datetime_iso: ""
+    });
+    return;
+  }
 
-          const calendarUrl = buildGoogleCalendarUrl(reminder);
-          const reminderDate = new Date(reminder.datetime_iso);
-          if (!calendarUrl || Number.isNaN(reminderDate.getTime())) {
-            calendarCard.classList.add("is-hidden");
-            return;
-          }
+  const calendarUrl = buildGoogleCalendarUrl(reminder);
+  const reminderDate = new Date(reminder.datetime_iso);
+  if (!calendarUrl || Number.isNaN(reminderDate.getTime())) {
+    calendarCard.classList.add("is-hidden");
+    return;
+  }
 
-          calendarTitle.textContent = reminder.title;
-          calendarDetails.textContent = reminder.details || "A beszélgetés alapján naptári emlékeztetőt azonosítottunk.";
-          calendarDate.textContent = formatDate(reminderDate);
-          googleCalendarLink.href = calendarUrl;
-          calendarCard.classList.remove("is-hidden");
-    webhookStatus.textContent = "";
-    if (typeof reminder !== "undefined" && reminder) {
-      sendCalendarWebhook(reminder);
-    } else {
-      const safeCall = (typeof call !== "undefined" && call) ? call : {};
-      sendCalendarWebhook({
-        has_reminder: false,
-        title: safeCall?.topic || safeCall?.summary || "Hívásjegyzet",
-        details: safeCall?.summary || safeCall?.rawText || "",
-        datetime_iso: ""
-      });
-    }
+  calendarTitle.textContent = reminder.title;
+  calendarDetails.textContent = reminder.details || "A beszélgetés alapján naptári emlékeztetőt azonosítottunk.";
+  calendarDate.textContent = formatDate(reminderDate);
+  googleCalendarLink.href = calendarUrl;
+  calendarCard.classList.remove("is-hidden");
+  webhookStatus.textContent = "";
+
+  // Webhook küldése naptári eseménynél:
+  sendCalendarWebhook(reminder);
   }
         function buildWebhookPayload(reminder, isTest = false) {
     const r = (typeof reminder !== "undefined" && reminder) ? reminder : {};
