@@ -1472,15 +1472,7 @@
       raw_text: c?.rawText || ""
     };
   }
-      caller: {
-        name: c?.callerName || "",
-        company: c?.companyName || ""
-      },
-      summary: c?.summary || reminder?.details || "",
-      raw_text: c?.rawText || ""
-    };
-  }
-        async function sendWebhookRequest(webhookUrl, payload) {
+          async function sendWebhookRequest(webhookUrl, payload) {
           const serializedPayload = JSON.stringify(payload);
           console.log("[Callnote] Webhook cél-URL:", webhookUrl);
           console.log("[Callnote] Webhook JSON:", serializedPayload);
