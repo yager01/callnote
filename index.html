@@ -1500,7 +1500,13 @@
                     start: eventDate,
                     datetime_iso: eventDate,
                     details: eventDetails,
-                    description: eventDetails
+                    description: eventDetails,
+                    name: payload?.caller?.name || (typeof call !== "undefined" ? call?.callerName : "") || (callerInput ? callerInput.value.trim() : ""),
+                    company: payload?.caller?.company || (typeof call !== "undefined" ? call?.companyName : "") || (companyInput ? companyInput.value.trim() : ""),
+                    caller: {
+                      name: payload?.caller?.name || (typeof call !== "undefined" ? call?.callerName : "") || (callerInput ? callerInput.value.trim() : ""),
+                      company: payload?.caller?.company || (typeof call !== "undefined" ? call?.companyName : "") || (companyInput ? companyInput.value.trim() : "")
+                    }
                   };
 
                   const serializedData = JSON.stringify(cleanPayload);
@@ -1873,7 +1879,7 @@ async function sendCalendarWebhook(reminder) {
                 messages: [
                   {
                     role: "system",
-                    content: `Te egy magyar nyelvű hívásjegyzetelő asszisztens vagy. A kapott nyers hívásszöveget elemezd kizárólag a szövegben szereplő információk alapján. Ne találj ki adatokat. Ha valami nem derül ki, írd azt, hogy Nem derül ki a beszélgetésből. A category mező értéke kizárólag Céges vagy Magán lehet. A mai dátum ${todayIso}. Vizsgáld meg, kér-e a beszélő emlékeztetőt, határidőt vagy naptárbejegyzést, például "péntek 10-re állíts be emlékeztetőt" vagy "holnap hívjam vissza". Ha igen, a calendar.has_reminder legyen true, számítsd ki a relatív időpontot a mai dátumhoz képest, és add meg a helyi időt YYYY-MM-DDTHH:MM:SS formátumban. Ha nincs ilyen kérés, a calendar mezőben has_reminder legyen false, a többi mező pedig üres szöveg.`
+                    content: `Te egy magyar nyelvű hívásjegyzetelő asszisztens vagy. A kapott nyers hívásszöveget elemezd kizárólag a szövegben szereplő információk alapján. Ne találj ki adatokat. Különös figyelemmel azonosítsd a hívó vagy tárgyalópartner teljes nevét a beszélt szövegből (pl. "Beszéltem Kiss Tamással", "Kovács úrral egyeztettem" -> callerName: "Kiss Tamás"). Ha cégnév is elhangzik, azt írd a companyName mezőbe. Ha a név vagy cég nem hangzik el, írd azt, hogy Nem derül ki a beszélgetésből. A category mező értéke kizárólag Céges vagy Magán lehet. A mai dátum ${todayIso}. Vizsgáld meg, kér-e a beszélő emlékeztetőt, határidőt vagy naptárbejegyzést, például "péntek 10-re állíts be emlékeztetőt" vagy "holnap hívjam vissza". Ha igen, a calendar.has_reminder legyen true, számítsd ki a relatív időpontot a mai dátumhoz képest, és add meg a helyi időt YYYY-MM-DDTHH:MM:SS formátumban. Ha nincs ilyen kérés, a calendar mezőben has_reminder legyen false, a többi mező pedig üres szöveg.`
                   },
                   {
                     role: "user",
