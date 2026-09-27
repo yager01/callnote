@@ -1452,27 +1452,26 @@
           webhookStatus.textContent = "";
   }
 
-  // Mindig elküldjük a Make webhookot (Sheets mentéshez), akár van naptár, akár nincs:
-  const currentCall = (typeof call !== "undefined") ? call : {};
-
-  sendCalendarWebhook(reminder || {
-    has_reminder: false,
-    title: currentCall?.topic || currentCall?.summary || "Hívásjegyzet",
-    details: currentCall?.summary || currentCall?.rawText || "",
-    datetime_iso: ""
-  });
-
   function buildWebhookPayload(reminder, isTest = false) {
-    const c = (typeof call !== "undefined") ? call : {};
+    const r = (typeof reminder !== "undefined" && reminder) ? reminder : {};
+    const c = (typeof call !== "undefined" && call) ? call : {};
     return {
       source: "callnote",
       test: isTest,
       reminder: {
-        has_reminder: Boolean(reminder?.has_reminder),
-        title: reminder?.title || c?.topic || c?.summary || "Hívásjegyzet",
-        datetime_iso: reminder?.datetime_iso || "",
-        details: reminder?.details || c?.summary || ""
+        has_reminder: Boolean(r?.has_reminder),
+        title: r?.title || c?.topic || c?.summary || "Hívásjegyzet",
+        datetime_iso: r?.datetime_iso || "",
+        details: r?.details || c?.summary || ""
       },
+      caller: {
+        name: c?.callerName || "",
+        company: c?.companyName || ""
+      },
+      summary: c?.summary || r?.details || "",
+      raw_text: c?.rawText || ""
+    };
+  }
       caller: {
         name: c?.callerName || "",
         company: c?.companyName || ""
