@@ -1450,24 +1450,33 @@
           googleCalendarLink.href = calendarUrl;
           calendarCard.classList.remove("is-hidden");
           webhookStatus.textContent = "";
-          sendCalendarWebhook(reminder);
-        }
+  }
 
+  // Mindig elküldjük a Make webhookot (Sheets mentéshez), akár van naptár, akár nincs:
+  sendCalendarWebhook(reminder || {
+    has_reminder: false,
+    title: call?.topic || call?.summary || "Hívásjegyzet",
+    details: call?.summary || call?.rawText || "",
+    datetime_iso: ""
+  });  
+        
         function buildWebhookPayload(reminder, isTest = false) {
           return {
             source: "callnote",
             test: isTest,
             reminder: {
-              has_reminder: Boolean(reminder?.has_reminder),
-              title: reminder.title,
-              datetime_iso: reminder.datetime_iso,
-              details: reminder.details
-            },
-            caller: {
-              name: call?.callerName || "",
-              company: call?.companyName || ""
-            }
-          };
+      has_reminder: Boolean(reminder?.has_reminder),
+      title: reminder?.title || call?.topic || call?.summary || "Hívásjegyzet",
+      datetime_iso: reminder?.datetime_iso || "",
+      details: reminder?.details || call?.summary || ""
+    },
+    caller: {
+      name: call?.callerName || "",
+      company: call?.companyName || ""
+    },
+    summary: call?.summary || reminder?.details || "",
+    raw_text: call?.rawText || ""
+  };
         }
 
         async function sendWebhookRequest(webhookUrl, payload) {
@@ -1526,9 +1535,11 @@
             return;
           }
 
-          const deliveryKey = `${webhookUrl}|${reminder.title}|${reminder.datetime_iso}`;
-          if (calendarWebhookSentFor === deliveryKey) return;
-          const payload = buildWebhookPayload(reminder);
+         const noteTitle = (reminder && reminder.title) ? reminder.title : (window.currentNoteTitle || "Jegyzet");
+  const noteDate = (reminder && reminder.datetime_iso) ? reminder.datetime_iso : new Date().toISOString();
+  const deliveryKey = `${webhookUrl}|${noteTitle}|${noteDate}`;
+  if (calendarWebhooksSentFor === deliveryKey) return;
+  const payload = buildWebhookPayload(reminder || { title: noteTitle, summary: "", details: "" });
           webhookStatus.textContent = "Webhook küldése…";
           setAutomationStatus("Webhook küldése a Make.com-nak…", "info");
           try {
