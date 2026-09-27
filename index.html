@@ -1450,18 +1450,19 @@
           googleCalendarLink.href = calendarUrl;
           calendarCard.classList.remove("is-hidden");
     webhookStatus.textContent = "";
-    sendCalendarWebhook(reminder);
-  } else {
-    // Ha nem naptári feljegyzés, akkor is elküldjük a Sheets-be:
-    const safeCall = (typeof call !== "undefined" && call) ? call : {};
-    sendCalendarWebhook({
-      has_reminder: false,
-      title: safeCall?.topic || safeCall?.summary || "Hívásjegyzet",
-      details: safeCall?.summary || safeCall?.rawText || "",
-      datetime_iso: ""
-    });
+    if (typeof reminder !== "undefined" && reminder) {
+      sendCalendarWebhook(reminder);
+    } else {
+      const safeCall = (typeof call !== "undefined" && call) ? call : {};
+      sendCalendarWebhook({
+        has_reminder: false,
+        title: safeCall?.topic || safeCall?.summary || "Hívásjegyzet",
+        details: safeCall?.summary || safeCall?.rawText || "",
+        datetime_iso: ""
+      });
+    }
   }
-  function buildWebhookPayload(reminder, isTest = false) {
+        function buildWebhookPayload(reminder, isTest = false) {
     const r = (typeof reminder !== "undefined" && reminder) ? reminder : {};
     const c = (typeof call !== "undefined" && call) ? call : {};
     return {
