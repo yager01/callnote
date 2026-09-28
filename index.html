@@ -2089,6 +2089,43 @@ async function sendCalendarWebhook(reminder) {
           }
         }
       })();
+      
+      // --- AUTOSTART VEZÉRLÉS (?autostart=true) ---
+(function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('autostart') === 'true') {
+    window.addEventListener('load', () => {
+      // 1. Hangjelzés (sípolás a diktálás kezdetének jelzésére)
+      setTimeout(() => {
+        try {
+          const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = 880; // Magas sípolás
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.25);
+        } catch (e) {
+          console.warn('AudioContext hiba:', e);
+        }
+      }, 500);
+
+      // 2. Késleltetett mikrofon aktiválás (3 másodperc után indul, hogy a sípolás lemenjen)
+      setTimeout(() => {
+        // Megkeresi a mikrofon gombot a felületen és megnyomja
+        const micBtn = document.querySelector('#mic-button') || 
+                       document.querySelector('button[aria-label*="mikrofon"]') || 
+                       document.querySelector('button.mic') ||
+                       document.querySelector('button');
+        if (micBtn) {
+          micBtn.click();
+        }
+      }, 3000);
+    });
+  }
+})();
     </script>
   </body>
 </html>
