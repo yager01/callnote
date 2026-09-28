@@ -2115,13 +2115,11 @@ async function sendCalendarWebhook(reminder) {
       // 2. Késleltetett mikrofon aktiválás (3 másodperc után indul, hogy a sípolás lemenjen)
       setTimeout(() => {
         // Megkeresi a mikrofon gombot a felületen és megnyomja
-        const micBtn = document.querySelector('#mic-button') || 
-                       document.querySelector('button[aria-label*="mikrofon"]') || 
-                       document.querySelector('button.mic') ||
-                       document.querySelector('button');
+        // Pontos találat az azonosító alapján:
+        const micBtn = document.getElementById('micButton');
         if (micBtn) {
           micBtn.click();
-        }
+                }
       }, 3000);
     });
   }
